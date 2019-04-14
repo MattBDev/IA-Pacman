@@ -176,16 +176,17 @@ def uniformCostSearch(problem):
         for succ in problem.getSuccessors(node):
 
             if not succ[0] in visited:
+                pathCost = succ[2]
                 if succ[0] in parents:
-                    pathCost = parents[node][2] + succ[2]
+                    pathCost += parents[node][2]
                     if pathCost < parents[succ[0]][2]:
                         parents[succ[0]] = node, succ[1], pathCost
-                    else: pathCost = parents[succ[0]][2]
+                    else: pathCost = parents[succ[0]][2] + succ[2]
                 else:
-                    pathCost = parents[node][2] if node in parents else 0
-                    parents[succ[0]] = node, succ[1], succ[2] + pathCost
+                    pathCost += parents[node][2] if node in parents else 0
+                    parents[succ[0]] = node, succ[1], pathCost
 
-                edges.update(succ[0], succ[2] + pathCost )
+                edges.update(succ[0], pathCost )
 
     return []
 
@@ -199,9 +200,48 @@ def nullHeuristic(state, problem=None):
 
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    startState = problem.getStartState()
 
+    if problem.isGoalState(startState): return []
+
+    edges, visited, parents = util.PriorityQueue(), [], dict()
+    startHeuristic = heuristic(startState, problem)
+    edges.push(startState, startHeuristic)
+
+    while not edges.isEmpty():
+
+        node = edges.pop()
+        visited.append(node)
+
+        if problem.isGoalState(node):
+            solution = []
+            transverseNode = parents[node]
+            while True:
+                if transverseNode[0] == startState:
+                    solution.insert(0, transverseNode[1])
+                    break
+
+                solution.insert(0, transverseNode[1])
+                transverseNode = parents[transverseNode[0]]
+
+            return solution
+
+        for succ in problem.getSuccessors(node):
+
+            if not succ[0] in visited:
+                pathCost = succ[2]
+                if succ[0] in parents:
+                    pathCost += parents[node][2]
+                    if pathCost < parents[succ[0]][2]:
+                        parents[succ[0]] = node, succ[1], pathCost
+                    else: pathCost = parents[succ[0]][2] + succ[2]
+                else:
+                    pathCost += parents[node][2] if node in parents else 0
+                    parents[succ[0]] = node, succ[1], pathCost
+
+                edges.update(succ[0], pathCost + heuristic(succ[0], problem) )
+
+    return []
 
 def learningRealTimeAStar(problem, heuristic=nullHeuristic):
     """Execute a number of trials of LRTA* and return the best plan found."""
