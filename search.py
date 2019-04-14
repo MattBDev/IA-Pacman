@@ -118,7 +118,7 @@ def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     startState = problem.getStartState()
 
-    if problem.isGoalState(startState[0]): return []
+    if problem.isGoalState(startState): return []
 
     edges, visited, parents = util.Queue(), [], dict()
     edges.push((startState, None))
@@ -148,9 +148,46 @@ def breadthFirstSearch(problem):
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    startState = problem.getStartState()
 
+    if problem.isGoalState(startState): return []
+
+    edges, visited, parents = util.PriorityQueue(), [], dict()
+    edges.push(startState , 0)
+
+    while not edges.isEmpty():
+
+        node = edges.pop()
+        visited.append(node)
+
+        if problem.isGoalState(node):
+            solution = []
+            transverseNode = parents[node]
+            while True:
+                if transverseNode[0] == startState:
+                    solution.insert(0, transverseNode[1])
+                    break
+
+                solution.insert(0, transverseNode[1])
+                transverseNode = parents[transverseNode[0]]
+
+            return solution
+
+        for succ in problem.getSuccessors(node):
+
+            if not succ[0] in visited:
+                if succ[0] in parents:
+                    pathCost = parents[node][2] + succ[2]
+                    if pathCost < parents[succ[0]][2]:
+                        parents[succ[0]] = node, succ[1], pathCost
+                    else: pathCost = parents[succ[0]][2]
+                else:
+                    pathCost = parents[node][2] if node in parents else 0
+                    parents[succ[0]] = node, succ[1], succ[2] + pathCost
+
+                edges.update(succ[0], succ[2] + pathCost )
+
+    return []
 
 def nullHeuristic(state, problem=None):
     """
