@@ -86,68 +86,52 @@ def depthFirstSearch(problem):
     print "Is the start a goal?", problem.isGoalState(problem.getStartState())
     print "Start's successors:", problem.getSuccessors(problem.getStartState())
     """
-
-    edges, visited, parents, startState  = util.Stack(), [], dict(), problem.getStartState()
-    edges.push((startState, None))
+    edges, visited = util.Stack(), dict()
+    edges.push((problem.getStartState(),[], 0))
 
     while not edges.isEmpty():
 
-        node = edges.pop()
+        node, path, cost = edges.pop()
 
-        if problem.isGoalState(node[0]):
-            solution = []
-            transverseNode = node[0], node[1]
+        if problem.isGoalState(node):
+            return path
 
-            while True:
-                solution.insert(0, transverseNode[1])
-                transverseNode = parents[transverseNode[0]]
+        if not node in visited:
+            visited[node] = True
 
-                if transverseNode[0] == startState: break
-
-            return solution
-
-        visited.append(node[0])
-
-        for succ in problem.getSuccessors(node[0]):
-            if not succ[0] in visited:
-                edges.push(succ)
-                parents[succ[0]] = node[0], node[1]
+            for succNode, succPath, succCost in problem.getSuccessors(node):
+                succPath = path + [succPath]
+                succCost = cost + succCost
+                edges.push((succNode, succPath, succCost))
     return []
+
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
-    startState = problem.getStartState()
+    """startState = problem.getStartState()"""
 
-    if problem.isGoalState(startState): return []
-
-    edges, visited, parents = util.Queue(), [], dict()
-    edges.push((startState, None))
+    edges, visited = util.Queue(), dict()
+    edges.push((problem.getStartState(),[], 0))
 
     while not edges.isEmpty():
+        node, path, cost = edges.pop()
 
-        node = edges.pop()
-        visited.append(node[0])
+        if problem.isGoalState(node):
+            return path
 
-        if problem.isGoalState(node[0]):
-            solution = []
-            transverseNode = node[0], node[1]
-            while True:
-                solution.insert(0, transverseNode[1])
-                transverseNode = parents[transverseNode[0]]
+        if not node in visited:
+            visited[node] = True
 
-                if transverseNode[0] == startState: break
-
-            return solution
-
-        for succ in problem.getSuccessors(node[0]):
-            if not succ[0] in visited and not any(x for x in edges.list if x[0] == succ[0]):
-                parents[succ[0]] = node[0], node[1]
-                edges.push(succ)
+            for succNode, succPath, succCost in problem.getSuccessors(node):
+                succPath = path + [succPath]
+                succCost = cost + succCost
+                edges.push((succNode, succPath, succCost))
     return []
 
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
+
     startState = problem.getStartState()
 
     if problem.isGoalState(startState): return []
