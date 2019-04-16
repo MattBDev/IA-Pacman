@@ -298,15 +298,8 @@ class CornersProblem(search.SearchProblem):
         """
         Returns whether this search state is a goal state of the problem.
         """
-        currentCornersState = list(state[1])
-        if state[0] in self.corners:
-            cornerIndex = self.corners.index(state[0])
-            currentCornersState[cornerIndex] = True
 
-        currentCornersState = tuple(currentCornersState)
-        if all(y == True for y in currentCornersState): 
-            self.allCornersFounded = True
-
+        self._checkCorners(state)
         isGoal = False
         if self.allCornersFounded == True: isGoal = True
 
@@ -325,14 +318,7 @@ class CornersProblem(search.SearchProblem):
         successors = []
         if self.allCornersFounded == True : return successors
 
-        currentCornersState = list(state[1])
-        if state[0] in self.corners:
-            cornerIndex = self.corners.index(state[0])
-            currentCornersState[cornerIndex] = True
-
-        currentCornersState = tuple(currentCornersState)
-        if all(y == True for y in currentCornersState): 
-            self.allCornersFounded = True
+        cornerState = self._checkCorners(state)
 
         for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
             x,y = state[0]
@@ -342,7 +328,7 @@ class CornersProblem(search.SearchProblem):
             if not hitsWall:
                 nextState = (nextx, nexty)
                 cost = self.cost
-                successors.append(((nextState, currentCornersState), action, cost))
+                successors.append(((nextState, cornerState), action, cost))
         self._expanded += 1 # DO NOT CHANGE
 
         return successors
@@ -359,6 +345,21 @@ class CornersProblem(search.SearchProblem):
             x, y = int(x + dx), int(y + dy)
             if self.walls[x][y]: return 999999
         return len(actions)
+
+    def _checkCorners(self, state):
+        """
+        Private custom function to check if all corners are visited
+        """
+        currentCornersState = list(state[1])
+        if state[0] in self.corners:
+            cornerIndex = self.corners.index(state[0])
+            currentCornersState[cornerIndex] = True
+
+        currentCornersState = tuple(currentCornersState)
+        if all(y == True for y in currentCornersState): 
+            self.allCornersFounded = True
+
+        return currentCornersState
 
 
 def cornersHeuristic(state, problem):
