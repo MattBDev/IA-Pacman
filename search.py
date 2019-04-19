@@ -97,7 +97,7 @@ def depthFirstSearch(problem):
             return path
 
         if not node in visited:
-            visited[node] = True
+            visited[node] = path, cost
 
             for succNode, succPath, succCost in problem.getSuccessors(node):
                 succPath = path + [succPath]
@@ -120,7 +120,7 @@ def breadthFirstSearch(problem):
             return path
 
         if not node in visited:
-            visited[node] = True
+            visited[node] = path, cost
 
             for succNode, succPath, succCost in problem.getSuccessors(node):
                 succPath = path + [succPath]

@@ -379,10 +379,10 @@ def cornersHeuristic(state, problem):
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
     currPos = state[0]   
-    distances = [999999]
+    distances = []
 
     for cornerChecker in state[1]:
-        if not cornerChecker or currPos in corners:
+        if cornerChecker == False or currPos in corners:
             cornerIndex = state[1].index(cornerChecker)
             distances.append(chebyshevDistance(currPos, corners[cornerIndex]))
 
@@ -391,9 +391,7 @@ def cornersHeuristic(state, problem):
 
 def chebyshevDistance(a, b):
 
-    dist = max(abs(a[0] - b[0]), abs(a[1]-b[1]))
-
-    return dist
+    return max(abs(a[0] - b[0]), abs(a[1]-b[1]))
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your cornersHeuristic"
