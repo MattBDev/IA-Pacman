@@ -378,15 +378,22 @@ def cornersHeuristic(state, problem):
     corners = problem.corners # These are the corner coordinates
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
-    currPos = state[0]   
-    distances = []
+    unvisited = list()
+    visited = state[1]
+    node = state[0]
+    heuristic = 0
 
-    for cornerChecker in state[1]:
-        if cornerChecker == False or currPos in corners:
-            cornerIndex = state[1].index(cornerChecker)
-            distances.append(chebyshevDistance(currPos, corners[cornerIndex]))
+    for corner in corners:
+        cornerIndex = corners.index(corner)
+        if visited[cornerIndex] == False:
+            unvisited.append(corner)
 
-    heuristic = min(distances)
+    while unvisited:
+        distance, corner = min([(chebyshevDistance(node, corner), corner) for corner in unvisited])
+        heuristic += distance
+        node = corner
+        unvisited.remove(corner)
+
     return heuristic
 
 def chebyshevDistance(a, b):
